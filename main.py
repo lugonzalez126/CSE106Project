@@ -41,9 +41,9 @@ class Course(db.Model):
 class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
-    course_enrolled = db.Column(db.String(80), db.ForeignKey)
+    course_enrolled = db.Column(db.String(80))
     grade = db.Column(db.Integer)
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
+    course_id = db.Column(db.Integer)
 
 
 
@@ -80,7 +80,15 @@ def logout():
 @app.route('/dashboard',  methods=['GET','POST'])
 @login_required
 def dashboard():
-    return render_template('dashboard.html', user=current_user)
+    user = current_user
+    if user.type == 'student':
+        return render_template('student.html', user=current_user)
+    elif user.type == 'teacher':
+        return render_template('teacher.html', user=current_user)
+    elif user.type == 'admin':
+        return render_template('admin.html', user=current_user)
+    else:
+        return render_template('dashboard.html', user=current_user)
 
 if __name__ == "__main__":
     app.run(debug=True)
