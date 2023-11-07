@@ -88,7 +88,7 @@ def dashboard():
     elif user.type == 'admin':
         return render_template('admin.html', user=current_user)
     else:
-        return render_template('dashboard.html', user=current_user)
+        return "Unknown type"
 
 if __name__ == "__main__":
     app.run(debug=True)
