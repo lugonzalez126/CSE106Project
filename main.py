@@ -41,10 +41,11 @@ class Course(db.Model):
 class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
-    course_enrolled = db.Column(db.String(80), db.ForeignKey('course.course_name'))
-    #course = db.relationship('Course', backref='students', foreign_keys=[course_name])
+    course_enrolled = db.Column(db.String(80), db.ForeignKey)
     grade = db.Column(db.Integer)
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
+
+
 
 
 class Login_Form(FlaskForm):
