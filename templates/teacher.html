@@ -8,7 +8,7 @@
     <div class="header">
         <h1>UC Merced</h1>
         <h2>Welcome, Teacher, {{ user.name }}</h2>
-        <button id="sign-out-button">Sign Out</button>
+        <a href="{{url_for('logout')}}">Logout</a>
     </div>
 
     <h2>Your Courses</h2>
