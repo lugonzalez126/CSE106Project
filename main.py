@@ -20,9 +20,6 @@ Login_manager.init_app(app)
 Login_manager.login_view = "login"
 
 
-@Login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
 
 
 
@@ -65,12 +62,17 @@ class Teacher(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 class Login_Form(FlaskForm):
-    name = StringField(validators=[InputRequired(), Length(
+    username = StringField(validators=[InputRequired(), Length(
         min=4, max=20)], render_kw={"placeholder": "Username"})
     password = PasswordField(validators=[InputRequired(), Length(
         min=4, max=20)], render_kw={"placeholder": "Password"})
     
     submit = SubmitField("login")
+
+@Login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
 
 @app.route('/')
 def main():
@@ -80,10 +82,10 @@ def main():
 def login():
     form = Login_Form()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user:
-            if user.password == form.password.data:
-                login_user(user)
+        person = User.query.filter_by(username=form.username.data).first()
+        if person:
+            if person.password == form.password.data:
+                login_user(person)
                 return redirect(url_for('dashboard'))
     return render_template('login.html', form=form)
 
