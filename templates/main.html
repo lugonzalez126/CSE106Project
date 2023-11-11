@@ -3,9 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #add8e6; 
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h1 {
+            color: #000080; 
+        }
+
+        #login-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #000080; 
+            color: #ffffff; 
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+    <title>UC Merced</title>
 </head>
 <body>
-    <a href="login">Login</a>
+    <div class="container">
+        <h1>UC Merced</h1>
+        <a id="login-btn" href="login">Login</a>
+    </div>
 </body>
 </html>
