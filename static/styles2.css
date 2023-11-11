@@ -1,9 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
+
         body {
             display: flex;
             justify-content: center;
@@ -13,6 +8,29 @@
             background-color: #add8e6; 
         }
 
+        form {
+            text-align: center;
+            background-color: #ffffff; 
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #000080; 
+            color: #ffffff; 
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
         .container {
             text-align: center;
         }
@@ -31,13 +49,3 @@
             border-radius: 5px;
             margin-top: 20px;
         }
-    </style>
-    <title>UC Merced</title>
-</head>
-<body>
-    <div class="container">
-        <h1>UC Merced</h1>
-        <a id="login-btn" href="login">Login</a>
-    </div>
-</body>
-</html>

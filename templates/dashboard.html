@@ -3,11 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+
+    <title>Student Portal</title>
 </head>
 <body>
+<<<<<<< Updated upstream:templates/dashboard.html
     <h1>Logged in</h1>
     <h2>Hi {{ user.name }}</h2>
     <a href="{{url_for('logout')}}">Logout</a>
+=======
+    <header>
+        <h1>UC Merced</h1>
+        <a href="{{url_for('logout')}}">Logout</a>
+    </header>
+    <h2>Hello, you are a student</h2>
+
+    <div class="tabs">
+        <a href="#view">View Classes</a>
+        <a href="#add">Add Classes</a>
+    </div>
+
+    <div class="container" id="view" style="display: none;">
+
+        <h2>Your Classes</h2>
+        <table>
+            <tr>
+                <th>Course Name</th>
+                <th>Teacher</th>
+                <th>Time</th>
+                <th>Students Enrolled</th>
+            </tr>
+          
+        </table>
+    </div>
+
+    <div class="container" id="add">
+
+        <h2>Available Classes</h2>
+        <table>
+            <tr>
+                <th>Course Name</th>
+                <th>Teacher</th>
+                <th>Time</th>
+                <th>Students Enrolled</th>
+                <th>Action</th>
+            </tr>
+           
+            <tr>
+                <td>Course A</td>
+                <td>Teacher A</td>
+                <td>Time A</td>
+                <td>25</td>
+                <td><a href="#" class="button">Add Class</a></td>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+       
+        document.querySelectorAll('.tabs a').forEach(tab => {
+            tab.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelectorAll('.container').forEach(container => {
+                    container.style.display = 'none';
+                });
+                document.querySelector(this.getAttribute('href')).style.display = 'block';
+            });
+        });
+    </script>
+>>>>>>> Stashed changes:templates/student.html
 </body>
 </html>
