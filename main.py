@@ -1,5 +1,6 @@
 from flask import Flask, render_template,url_for, redirect
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import ForeignKey
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect
@@ -21,32 +22,47 @@ Login_manager.login_view = "login"
 
 @Login_manager.user_loader
 def load_user(user_id):
-    return Login.query.get(int(user_id))
+    return User.query.get(int(user_id))
 
-class Login(db.Model, UserMixin):
+
+
+courses_students = db.Table(
+    'courses_students',
+    db.Column('course_id', db.Integer, db.ForeignKey('course.id'), primary_key=True),
+    db.Column('student_id', db.Integer, db.ForeignKey('student.id'), primary_key=True)
+)    
+courses_teachers = db.Table(
+    'courses_teachers',
+    db.Column('course_id', db.Integer, db.ForeignKey('course.id'), primary_key=True),
+    db.Column('teacher_id', db.Integer, db.ForeignKey('teacher.id'), primary_key=True)
+)
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), nullable=False, unique=True)
+    username = db.Column(db.String(80), nullable=False, unique=True)
     type = db.Column(db.String(7))
     password = db.Column(db.String(80), nullable=False)
-
+    
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    time = db.Column(db.String(80))
+    teachers = db.relationship('Teacher', secondary=courses_teachers, back_populates='courses')
+    students = db.relationship('Student', secondary=courses_students, back_populates='courses')
     course_name = db.Column(db.String(80))
-    teacher = db.Column(db.String(80))
-    time = db.Column(db.String(80)) 
-    enrolled = db.Column(db.Integer)
     capacity = db.Column(db.Integer)
-   
+
 
 class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
-    course_enrolled = db.Column(db.String(80))
+    courses = db.relationship('Course', secondary=courses_students,back_populates='students')
     grade = db.Column(db.Integer)
-    course_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-
-
+class Teacher(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80))
+    courses = db.relationship('Course', secondary=courses_teachers,back_populates='teachers')
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 class Login_Form(FlaskForm):
     name = StringField(validators=[InputRequired(), Length(
@@ -64,7 +80,7 @@ def main():
 def login():
     form = Login_Form()
     if form.validate_on_submit():
-        user = Login.query.filter_by(name=form.name.data).first()
+        user = User.query.filter_by(username=form.username.data).first()
         if user:
             if user.password == form.password.data:
                 login_user(user)
