@@ -200,6 +200,39 @@ def course_students(ID):
             return jsonify({"message": "Access forbidden"}), 403
     else:
         return jsonify({"message": "Access forbidden"}), 403
-    
+
+@app.route('/class/<int:course_id>/update-grades', methods=['POST'])
+@login_required
+def update_grades(course_id):
+    user = current_user
+
+    if user.type == 'teacher':
+        teacher = Teacher.query.filter_by(user_id=user.id).first()
+        course = Course.query.get(course_id)
+
+        if teacher and course in teacher.courses:
+            data = request.get_json()
+
+            if 'grades' not in data:
+                return jsonify({"message": "Grades data is required"}), 400
+
+            grades_data = data['grades']
+
+            for student_id, grade in grades_data.items():
+                student = Student.query.get(student_id)
+
+                if student and student in course.students:
+                    student.grade = grade
+                    db.session.commit()
+                else:
+                    return jsonify({"message": f"Student with ID {student_id} not found or not enrolled in the course"}), 400
+
+            return jsonify({"message": "Grades updated successfully"}), 200
+        else:
+            return jsonify({"message": "Access forbidden"}), 403
+    else:
+        return jsonify({"message": "Access forbidden"}), 403
+
+
 if __name__ == "__main__":
     app.run(debug=True)
