@@ -125,7 +125,81 @@ def student_class():
             return jsonify({"classes": all_classes})
         else:
             return jsonify({"message": "Student not found"}), 404
+    elif user.type == 'teacher':
+        teacher = Teacher.query.filter_by(user_id=user.id).first()
+        if teacher:
+            teacher_courses = teacher.courses
+            teacher_classes = [
+                {"id": course.id, "course_name": course.course_name, "time": course.time, "capacity": course.capacity}
+                for course in teacher_courses
+            ]
+            return jsonify({"classes": teacher_classes})
+        else:
+            return jsonify({"message": "Teacher not found"}), 404
     else:
         return jsonify({"message": "Access forbidden"}), 403
+
+@app.route('/enroll', methods=['POST'])
+@login_required
+def enroll_in_class():
+    user = current_user
+
+    if user.type == 'student':
+        data = request.get_json()
+        if 'class_id' not in data:
+            return jsonify({"message": "Class ID is required"}), 400
+        class_id = data['class_id']
+        course = Course.query.get(class_id)
+        if not course:
+            return jsonify({"message": "Class not found"}), 404
+        if user in course.students:
+            course.students.remove(user)
+            db.session.commit()
+            return jsonify({"message": "Student removed from the class"}), 200
+        if len(course.students) >= course.capacity:
+            return jsonify({"message": "Class is full"}), 400
+        course.students.append(user)
+        db.session.commit()
+        return jsonify({"message": "Enrollment successful"}), 200
+
+    else:
+        return jsonify({"message": "Access forbidden"}), 403
+
+@app.route('/class/<int:ID>', methods=['GET'])
+@login_required
+def course_students(ID):
+    user = current_user
+
+    if user.type == 'teacher':
+        teacher = Teacher.query.filter_by(user_id=user.id).first()
+        course = Course.query.filter_by(id=ID).first()   
+        if teacher and course in teacher.courses:
+            enrollments = course.students  
+
+            if enrollments:
+                unique_student_ids = set()
+                students_data = []
+
+                for enrollment in enrollments:
+                    student_id = enrollment.id  
+
+                    if student_id not in unique_student_ids:
+                        unique_student_ids.add(student_id)
+
+                        student_data = {
+                            "student_id": student_id,
+                            "student_name": enrollment.name,
+                            "grade": enrollment.grade
+                        }
+                        students_data.append(student_data)
+
+                return jsonify({"students": students_data})
+            else:
+                return jsonify({"message": "No students found for the course"}), 404
+        else:
+            return jsonify({"message": "Access forbidden"}), 403
+    else:
+        return jsonify({"message": "Access forbidden"}), 403
+    
 if __name__ == "__main__":
     app.run(debug=True)
