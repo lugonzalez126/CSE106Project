@@ -20,9 +20,6 @@ Login_manager.init_app(app)
 Login_manager.login_view = "login"
 
 
-
-
-
 courses_students = db.Table(
     'courses_students',
     db.Column('course_id', db.Integer, db.ForeignKey('course.id'), primary_key=True),
@@ -132,7 +129,7 @@ def student_class():
         if teacher:
             teacher_courses = teacher.courses
             teacher_classes = [
-                {"id": course.id, "course_name": course.course_name, "time": course.time, "capacity": course.capacity}
+                {"name": teacher.name, "course_name": course.course_name, "time": course.time, "capacity": course.capacity}
                 for course in teacher_courses
             ]
             return jsonify({"classes": teacher_classes})
