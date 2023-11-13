@@ -119,8 +119,10 @@ def student_class():
             for s in student_list:
                 classes = s.courses
                 for c in classes:
+                    teacher = c.teachers[0]
+                    teacher_name = teacher.name
                     course_count = len(c.students)
-                    class_info = {"id": c.id, "course_name": c.course_name, "time": c.time, "capacity": c.capacity, "amount":course_count}
+                    class_info = {"id": c.id, "course_name": c.course_name, "time": c.time, "capacity": c.capacity, "amount":course_count, "teacher_name": teacher_name}
                     all_classes.append(class_info)
             return jsonify({"classes": all_classes})
         else:
