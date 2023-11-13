@@ -1,4 +1,4 @@
-from flask import Flask, render_template,url_for, redirect
+from flask import Flask, render_template,url_for, redirect, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
@@ -63,9 +63,9 @@ class Teacher(db.Model):
 
 class Login_Form(FlaskForm):
     username = StringField(validators=[InputRequired(), Length(
-        min=4, max=20)], render_kw={"placeholder": "Username"})
+        min=2, max=20)], render_kw={"placeholder": "Username"})
     password = PasswordField(validators=[InputRequired(), Length(
-        min=4, max=20)], render_kw={"placeholder": "Password"})
+        min=2, max=20)], render_kw={"placeholder": "Password"})
     
     submit = SubmitField("login")
 
@@ -107,6 +107,24 @@ def dashboard():
         return render_template('admin.html', user=current_user)
     else:
         return "Unknown type"
-
+@app.route('/classes', methods = ['GET'])
+@login_required
+def student_class():
+    user = current_user
+    if user.type == 'student':
+        student_list = Student.query.filter_by(user_id=user.id).all()
+        print(student_list)
+        if student_list:
+            all_classes = []
+            for s in student_list:
+                classes = s.courses
+                for c in classes:
+                    class_info = {"id": c.id, "course_name": c.course_name, "time": c.time, "capacity": c.capacity}
+                    all_classes.append(class_info)
+            return jsonify({"classes": all_classes})
+        else:
+            return jsonify({"message": "Student not found"}), 404
+    else:
+        return jsonify({"message": "Access forbidden"}), 403
 if __name__ == "__main__":
     app.run(debug=True)
