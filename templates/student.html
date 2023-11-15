@@ -18,7 +18,7 @@
 
     <div id="your-courses" class="tabcontent">
         <h2>Your Courses</h2>
-        <table id="courses-table">
+        <table id="your-courses-table">
             <tr>
                 <th>Course Name</th>
                 <th>Teacher</th>
@@ -30,7 +30,7 @@
 
     <div id="add-courses" class="tabcontent">
         <h2>Add Courses</h2>
-        <table>
+        <table id="add-courses-table">
             <tr>
                 <th>Course Name</th>
                 <th>Teacher</th>
@@ -38,24 +38,7 @@
                 <th>Students Enrolled</th>
                 <th>Add Class</th>
             </tr>
-            <tr>
-                <td>Course 1</td>
-                <td>Teacher 1</td>
-                <td>Course Time 1</td>
-                <td>25</td>
-                <td><button id="add-button">Add Class</button>
-                    <button id="subtract-button">Drop Class</button></td>
-                
-            </tr>
-            <tr>
-                <td>Course 2</td>
-                <td>Teacher 2</td>
-                <td>Course Time 2</td>
-                <td>30</td>
-                <td><button id="add-button">Add Class</button>
-                    <button id="subtract-button">Drop Class</button></td>
-            </tr>
-            <!-- Add course data here with an "Add Class" button -->
+            <!-- Courses will be added dynamically here -->
         </table>
     </div>
 
@@ -84,12 +67,15 @@
             // Fetch data from the server
             fetch('http://127.0.0.1:5000/classes')
                 .then(response => response.json())
-                .then(data => displayCourses(data))
+                .then(data => {
+                    displayCourses(data, 'your-courses-table');
+                    displayCourses(data, 'add-courses-table', true);
+                })
                 .catch(error => console.error('Error:', error));
         });
     
-        function displayCourses(data) {
-            var table = document.getElementById('courses-table');
+        function displayCourses(data, tableId, addButton = false) {
+            var table = document.getElementById(tableId);
     
             // Populate table with data
             data.classes.forEach(course => {
@@ -98,13 +84,33 @@
                 row.insertCell(1).innerHTML = course.teacher_name;  
                 row.insertCell(2).innerHTML = course.time;
                 row.insertCell(3).innerHTML = course.amount;
+                
+                if (addButton) {
+                    var addButtonCell = row.insertCell(4);
+                    var addBtn = document.createElement('button');
+                    addBtn.textContent = 'Add Class';
+                    addBtn.addEventListener('click', function() {
+                        // Add class logic here
+                        alert('Class added!');
+                    });
+                    addButtonCell.appendChild(addBtn);
+                    
+                    var subtractBtn = document.createElement('button');
+                    subtractBtn.textContent = 'Drop Class';
+                    subtractBtn.addEventListener('click', function() {
+                        // Drop class logic here
+                        alert('Class dropped!');
+                    });
+                    addButtonCell.appendChild(subtractBtn);
+                }
             });
         }
     </script>
 </body>
 </html>
 
-<style>/* Add your CSS styles here */
+<style>
+/* Add your CSS styles here */
 
 body {
     font-family: Arial, sans-serif;
@@ -168,4 +174,3 @@ th {
     background-color: #f2f2f2;
 }
 </style>
-   
