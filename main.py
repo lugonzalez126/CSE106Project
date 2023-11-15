@@ -1,4 +1,4 @@
-from flask import Flask, render_template,url_for, redirect, jsonify
+from flask import Flask, render_template,url_for, redirect, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
