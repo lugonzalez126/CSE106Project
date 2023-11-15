@@ -1,38 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <title>Teacher Page</title>
+    <link rel="stylesheet" type="text/css" href="teacherstyle.css">
+</head>
+<body>
     <div class="header">
         <h1>UC Merced</h1>
-        <h2>Welcome, Teacher, {{ user.name }}</h2>
+        <h2>Welcome, {{ user_name }}</h2>
         <a href="{{url_for('logout')}}">Logout</a>
     </div>
 
-    <title>Courses</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
+    <h2>Your Courses</h2>
 
-        table, th, td {
-            border: 1px solid #ddd;
-            text-align: left;
-            padding: 8px;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
-</head>
-<body>
-
-    <h1>Your Courses</h1>
-    
     <table id="courses-table">
         <tr>
             <th>Course Name</th>
@@ -40,7 +20,11 @@
             <th>Time</th>
             <th>Students Enrolled</th>
         </tr>
+        <!-- Course rows will be added dynamically here -->
     </table>
+
+    <!-- Course details containers -->
+    <div class="course-details" style="display: none;"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -57,13 +41,92 @@
             // Populate table with data
             data.classes.forEach(course => {
                 var row = table.insertRow(-1);
-                row.insertCell(0).innerHTML = course.course_name;
+                row.insertCell(0).innerHTML = `<a href="#" onclick="showCourseDetails('${course.course_name}')">${course.course_name}</a>`;
                 row.insertCell(1).innerHTML = course.name;
                 row.insertCell(2).innerHTML = course.time;
                 row.insertCell(3).innerHTML = course.capacity;
             });
         }
-    </script>
 
+        function showCourseDetails(courseName) {
+            var detailsContainer = document.querySelector('.course-details');
+            detailsContainer.innerHTML = ''; // Clear previous content
+
+            // Create elements for course details
+            var header = document.createElement('h2');
+            header.textContent = courseName;
+
+            var backButton = document.createElement('button');
+            backButton.textContent = 'Back to Courses';
+            backButton.addEventListener('click', function () {
+                showCourseList();
+            });
+
+            var table = document.createElement('table');
+            table.innerHTML = `
+                <tr>
+                    <th>Student Name</th>
+                    <th>Grades</th>
+                </tr>
+                <!-- Add student and grade information here -->
+                <tr>
+                    <td>Nancy Little</td>
+                    <td>89</td>
+                </tr>
+            `;
+
+            // Append elements to the details container
+            detailsContainer.appendChild(header);
+            detailsContainer.appendChild(backButton);
+            detailsContainer.appendChild(table);
+
+            // Show details container
+            detailsContainer.style.display = 'block';
+        }
+
+        function showCourseList() {
+            document.querySelector('.course-details').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
+
+<style>
+/* Add your CSS styles here */
+body {
+    font-family: Arial, sans-serif;
+}
+
+.header {
+    background-color: #007BFF;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+}
+
+.header h1 {
+    font-size: 24px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+.course-details {
+    display: none;
+}
+</style>

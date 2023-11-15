@@ -87,7 +87,7 @@ def login():
                     thePerson = Student.query.filter_by(user_id=person.id).first()
                 elif(person.type == 'teacher'):
                     thePerson = Teacher.query.filter_by(user_id=person.id).first()
-                return redirect(url_for('dashboard', student_name=thePerson.name))
+                return redirect(url_for('dashboard',  user_name=thePerson.name))
     return render_template('login.html', form=form)
 
 @app.route('/logout', methods=['GET','POST'])
@@ -100,12 +100,13 @@ def logout():
 @login_required
 def dashboard():
     user = current_user
+    user_name = request.args.get('user_name', None)
     if user.type == 'student':
-        return render_template('student.html', user=current_user)
+        return render_template('student.html', user=current_user, user_name = user_name)
     elif user.type == 'teacher':
-        return render_template('teacher.html', user=current_user)
+        return render_template('teacher.html', user=current_user,  user_name = user_name)
     elif user.type == 'admin':
-        return render_template('admin.html', user=current_user)
+        return render_template('admin.html', user=current_user,  user_name = user_name)
     else:
         return "Unknown type"
 @app.route('/classes', methods = ['GET'])
