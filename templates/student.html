@@ -23,7 +23,7 @@
                 <th>Course Name</th>
                 <th>Teacher</th>
                 <th>Time</th>
-                <th>Students Enrolled</th>
+                <th>Students Enrolled / Max Capacity</th>
             </tr>
         </table>
     </div>
@@ -97,7 +97,7 @@
                 row.insertCell(0).innerHTML = course.course_name;
                 row.insertCell(1).innerHTML = course.teacher_name;  
                 row.insertCell(2).innerHTML = course.time;
-                row.insertCell(3).innerHTML = course.amount;
+                row.insertCell(3).innerHTML = course.amount + ' / ' + course.capacity;
             });
         }
     </script>
