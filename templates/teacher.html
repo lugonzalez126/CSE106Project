@@ -1,133 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Teacher Page</title>
-    <link rel="stylesheet" type="text/css" href="teacherstyle.css">
-</head>
-<body>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <div class="header">
         <h1>UC Merced</h1>
         <h2>Welcome, Teacher, {{ user.name }}</h2>
         <a href="{{url_for('logout')}}">Logout</a>
     </div>
 
-    <h2>Your Courses</h2>
+    <title>Courses</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
 
-    <table>
+        table, th, td {
+            border: 1px solid #ddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Your Courses</h1>
+    
+    <table id="courses-table">
         <tr>
             <th>Course Name</th>
             <th>Teacher</th>
             <th>Time</th>
             <th>Students Enrolled</th>
         </tr>
-        <tr>
-            <td><a href="#" onclick="showCourseDetails('Course 1')">Course 1</a></td>
-            <td>Teacher 1</td>
-            <td>Course Time 1</td>
-            <td>25</td>
-        </tr>
-        <tr>
-            <td><a href="#" onclick="showCourseDetails('Course 2')">Course 2</a></td>
-            <td>Teacher 2</td>
-            <td>Course Time 2</td>
-            <td>30</td>
-        </tr>
-        <!-- Add more course rows as needed -->
     </table>
 
-    <div id="course1-details" style="display: none;">
-        <h2 id="course1-name-header"></h2>
-        <button id="back-button" onclick="showCourseList()">Back to Courses</button>
-        <table>
-            <tr>
-                <th>Student Name</th>
-                <th>Grades</th>
-            </tr>
-            <!-- Add student and grade information here -->
-            <td>Nancy Little</td>
-            <td>89</td>
-        </table>
-    </div>
-
-    <div id="course2-details" style="display: none;">
-        <h2 id="course2-name-header"></h2>
-        <button id="back-button" onclick="showCourseList()">Back to Courses</button>
-        <table>
-            <tr>
-                <th>Student Name</th>
-                <th>Grades</th>
-            </tr>
-            <!-- Add student and grade information here -->
-            <td>Richard Lopez</td>
-            <td>67</td>
-        </table>
-    </div>
-
     <script>
-        function showCourseDetails(courseName) {
-            if (courseName === 'Course 1') {
-                document.getElementById("course1-name-header").textContent = courseName;
-                document.getElementById("course1-details").style.display = "block";
-                document.getElementById("course2-details").style.display = "none";
-            } else if (courseName === 'Course 2') {
-                document.getElementById("course2-name-header").textContent = courseName;
-                document.getElementById("course2-details").style.display = "block";
-                document.getElementById("course1-details").style.display = "none";
-            }
-        }
+        document.addEventListener('DOMContentLoaded', function () {
+            // Fetch data from the server
+            fetch('http://127.0.0.1:5000/classes')
+                .then(response => response.json())
+                .then(data => displayCourses(data))
+                .catch(error => console.error('Error:', error));
+        });
 
-        function showCourseList() {
-            document.getElementById("course1-details").style.display = "none";
-            document.getElementById("course2-details").style.display = "none";
+        function displayCourses(data) {
+            var table = document.getElementById('courses-table');
+
+            // Populate table with data
+            data.classes.forEach(course => {
+                var row = table.insertRow(-1);
+                row.insertCell(0).innerHTML = course.course_name;
+                row.insertCell(1).innerHTML = course.name;
+                row.insertCell(2).innerHTML = course.time;
+                row.insertCell(3).innerHTML = course.capacity;
+            });
         }
     </script>
+
 </body>
 </html>
-
-<style>/* Add your CSS styles here */
-
-body {
-    font-family: Arial, sans-serif;
-}
-
-.header {
-    background-color: #007BFF;
-    color: #fff;
-    text-align: center;
-    padding: 10px;
-}
-
-.header h1 {
-    font-size: 24px;
-}
-
-table {
-    border-collapse: collapse;
-    width: 100%;
-}
-
-table, th, td {
-    border: 1px solid #ddd;
-}
-
-th, td {
-    padding: 10px;
-    text-align: left;
-}
-
-th {
-    background-color: #f2f2f2;
-}
-
-#sign-out-button {
-    background-color: #e74c3c;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-#sign-out-button:hover {
-    background-color: #c0392b;
-}</style>
