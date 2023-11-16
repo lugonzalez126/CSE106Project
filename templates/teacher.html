@@ -20,79 +20,86 @@
             <th>Time</th>
             <th>Students Enrolled / Max Capacity</th>
         </tr>
-        <!-- Course rows will be added dynamically here -->
     </table>
 
-    <!-- Course details containers -->
+
     <div class="course-details" style="display: none;"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Fetch data from the server
+         
             fetch('http://127.0.0.1:5000/classes')
                 .then(response => response.json())
                 .then(data => displayCourses(data))
                 .catch(error => console.error('Error:', error));
         });
-
+    
         function displayCourses(data) {
             var table = document.getElementById('courses-table');
-
-            // Populate table with data
+    
+           
             data.classes.forEach(course => {
                 var row = table.insertRow(-1);
-                row.insertCell(0).innerHTML = `<a href="#" onclick="showCourseDetails('${course.course_name}')">${course.course_name}</a>`;
+                row.insertCell(0).innerHTML = `<a href="#" onclick="showCourseDetails(${course.id})">${course.course_name}</a>`;
                 row.insertCell(1).innerHTML = course.name;
                 row.insertCell(2).innerHTML = course.time;
                 row.insertCell(3).innerHTML = course.amount + ' / ' + course.capacity;
             });
         }
-
-        function showCourseDetails(courseName) {
+    
+        function showCourseDetails(courseId) {
             var detailsContainer = document.querySelector('.course-details');
-            detailsContainer.innerHTML = ''; // Clear previous content
-
-            // Create elements for course details
+            detailsContainer.innerHTML = '';
+    
+          
             var header = document.createElement('h2');
-            header.textContent = courseName;
-
+            header.textContent = `Course Details - ID: ${courseId}`;
+    
             var backButton = document.createElement('button');
             backButton.textContent = 'Back to Courses';
             backButton.addEventListener('click', function () {
                 showCourseList();
             });
-
+    
             var table = document.createElement('table');
             table.innerHTML = `
                 <tr>
                     <th>Student Name</th>
                     <th>Grades</th>
                 </tr>
-                <!-- Add student and grade information here -->
-                <tr>
-                    <td>Nancy Little</td>
-                    <td>89</td>
-                </tr>
             `;
-
-            // Append elements to the details container
+    
+           
+            fetch(`http://127.0.0.1:5000/class/${courseId}`, { method: 'GET' })
+                .then(response => response.json())
+                .then(data => {
+                    data.students.forEach(student => {
+                        var row = table.insertRow(-1);
+                        row.insertCell(0).innerHTML = student.student_name;
+                        row.insertCell(1).innerHTML = student.grade;
+                    });
+                })
+                .catch(error => console.error('Error fetching student data:', error));
+    
+        
             detailsContainer.appendChild(header);
             detailsContainer.appendChild(backButton);
             detailsContainer.appendChild(table);
-
-            // Show details container
+    
+        
             detailsContainer.style.display = 'block';
         }
-
+    
         function showCourseList() {
             document.querySelector('.course-details').style.display = 'none';
         }
     </script>
+    
 </body>
 </html>
 
 <style>
-/* Add your CSS styles here */
+
 body {
     font-family: Arial, sans-serif;
 }

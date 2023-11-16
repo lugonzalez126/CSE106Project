@@ -38,7 +38,6 @@
                 <th>Students Enrolled</th>
                 <th>Add Class</th>
             </tr>
-            <!-- Courses will be added dynamically here -->
         </table>
     </div>
 
@@ -58,13 +57,13 @@
         }
 
         document.getElementById("sign-out-button").addEventListener("click", function() {
-            // Perform sign-out action here
+        
             alert("You have been signed out.");
         });
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Fetch data from the server
+           
             fetch('http://127.0.0.1:5000/classes')
                 .then(response => response.json())
                 .then(data => {
@@ -73,7 +72,7 @@
                 .catch(error => console.error('Error:', error));
         });
         document.addEventListener('DOMContentLoaded', function () {
-            // Fetch data from the server
+            
             fetch('http://127.0.0.1:5000/allclasses')
                 .then(response => response.json())
                 .then(data => {
@@ -85,7 +84,7 @@
         function displayCourses(data, tableId, addButton = false) {
             var table = document.getElementById(tableId);
     
-            // Populate table with data
+        
             data.classes.forEach(course => {
                 var row = table.insertRow(-1);
                 row.insertCell(0).innerHTML = course.course_name;
@@ -98,7 +97,6 @@
                     var addBtn = document.createElement('button');
                     addBtn.textContent = 'Add Class';
                     addBtn.addEventListener('click', function() {
-                        // Add class logic here
                         alert('Class added!');
                     });
                     addButtonCell.appendChild(addBtn);
@@ -106,7 +104,6 @@
                     var subtractBtn = document.createElement('button');
                     subtractBtn.textContent = 'Drop Class';
                     subtractBtn.addEventListener('click', function() {
-                        // Drop class logic here
                         alert('Class dropped!');
                     });
                     addButtonCell.appendChild(subtractBtn);
