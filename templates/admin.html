@@ -1,71 +1,281 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+<html>
+    <head>
+        <title>Admin Controls</title>
+        <link href="../static/adminView.css" rel="stylesheet">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    </head>
 
-    <title>Student Portal</title>
-</head>
 <body>
-    <header>
-        <h1>UC Merced</h1>
-        <a href="{{url_for('logout')}}">Logout</a>
-    </header>
-    <h2>Hello, you are a student</h2>
+  <div>
+    <h1>USER DATA</h1>
+    <table>
+      <thread>
+        <tr>
+            <th>USER ID</th>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Password</th>
+            <th>Type of Account</th>
 
-    <div class="tabs">
-        <a href="#view">View Classes</a>
-        <a href="#add">Add Classes</a>
-    </div>
-
-    <div class="container" id="view" style="display: none;">
-
-        <h2>Your Classes</h2>
-        <table>
+        </tr>
+      </thread>
+        <tbody>
+            {% for user in users %}
             <tr>
-                <th>Course Name</th>
-                <th>Teacher</th>
-                <th>Time</th>
-                <th>Students Enrolled</th>
-            </tr>
-          
-        </table>
-    </div>
+                <th>{{user.userId}}</th>
+                <th>{{user.username}}</th>
+                <th>{{user.name}}</th>
+                <th>{{user.password}}</th>
+                <th>{{user.type}}</th>
 
-    <div class="container" id="add">
-
-        <h2>Available Classes</h2>
-        <table>
-            <tr>
-                <th>Course Name</th>
-                <th>Teacher</th>
-                <th>Time</th>
-                <th>Students Enrolled</th>
-                <th>Action</th>
             </tr>
-           
-            <tr>
-                <td>Course A</td>
-                <td>Teacher A</td>
-                <td>Time A</td>
-                <td>25</td>
-                <td><a href="#" class="button">Add Class</a></td>
-            </tr>
-        </table>
-    </div>
+            {% endfor %}
+        </tbody>
+    </table>
+      <h1>Create New User</h1>
+        <form>
+            <label for="user_name">Username:</label><br>
+            <input type="text" id="add_username" name="user_name" placeholder="Username"><br>
 
-    <script>
-       
-        document.querySelectorAll('.tabs a').forEach(tab => {
-            tab.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelectorAll('.container').forEach(container => {
-                    container.style.display = 'none';
-                });
-                document.querySelector(this.getAttribute('href')).style.display = 'block';
-            });
-        });
-    </script>
+            <label for="name">Name:</label><br>
+            <input type="text" id="add_name" name="name" placeholder="Name"><br>
+
+            <label for="password">Password:</label><br>
+            <input type="text" id="add_password" name="password" placeholder="Password"><br>
+
+            <label for="type">Account Type: (0:Student 1:Teacher 2:Admin)</label><br>
+            <input type="number" id="add_type" name="Account_type" placeholder="Account Type"><br>
+        </form>
+        <button type="button" id = "admin_newuser">Upload New User</button>
+      <h1>Courses Data</h1>
+        <table id = "admin_courses">
+            <thead>
+                <tr>
+                    <th>Class ID</th>
+                    <th>Class Name</th>
+                    <th>Teacher</th>
+                    <th>Time</th>
+                    <th>Students Enrolled</th>
+                    <th>Capacity</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in courses %}
+                <tr>
+                    <td>{{course.classId}}</td>
+                    <td>{{course.className}}</td>
+                    <td>{{course.teacher}}</td>
+                    <td>{{course.time}}</td>
+                    <td>{{course.enrolled}}</td>
+                    <td>{{course.capacity}}</td>
+                </tr>
+                {% endfor %}</tbody>
+        </table><br>
+      <h1>Create New Class</h1>
+        <form>
+            <label for="class_name">Class:</label><br>
+            <input type="text" id="add_class_name" name="class_name" placeholder="Class name"><br>
+
+            <label for="time">Time:</label><br>
+            <input type="text" id="add_time" name="time" placeholder="Time"><br>
+
+            <label for="capacity">Capacity:</label><br>
+            <input type="number" id="add_capacity" name="capacity" placeholder="Capactiy"><br>
+
+            <label for="current_students">Currently Enrolled:</label><br>
+            <input type="number" id="add_current_students" name="current_students" placeholder="Current Enrollment"><br>
+
+            <label for="teacher">Teacher:</label><br>
+            <input type="teacher" id="add_teacher" name="teacher" placeholder="Teacher"><br>
+        </form>
+        <button type="button" id = "admin_newclass">Upload New Class</button><br>
+      <h1>Enrollment Data</h1>
+        <table id = "admin_enrollment">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Class Name</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in range(0, length) %}
+                <tr>
+                    <td>{{enrolledUsers[i]}}</td>
+                    <td>{{enrolledCourses[i]}}</td>
+                    <td>{{enrolledGrades[i]}}</td>
+                </tr>
+                {% endfor %}</tbody>
+        </table><br>
+      <h1>Enroll Student in Class</h1>
+        <form>
+            <label for="enroll_username">Username:</label><br>
+            <input type="text" id="enroll_username" name="enroll_user_name" placeholder="Username"><br>
+
+            <label for="enroll_classname">Class:</label><br>
+            <input type="text" id="enroll_classname" name="enroll_classname" placeholder="Class"><br>
+
+            <label for="enroll_grade">Grade:</label><br>
+            <input type="number" id="enroll_grade" name="enroll_grade" placeholder="Grade"><br>
+        </form>
+        <button type="button" id = "admin_enroll">Enroll a Student to a Class</button><br>
+
+      <h1>Update a User</h1>
+        <form>
+            <label for="update_original_user">Original Username:</label><br>
+            <input type="text" id="update_original_user" name="update_original_user" placeholder="Original Username"><br>
+
+            <label for="update_new_user">New Username:</label><br>
+            <input type="text" id="update_new_user" name="update_new_user" placeholder="New Username"><br>
+
+            <label for="update_new_name">New Name:</label><br>
+            <input type="text" id="update_new_name" name="update_new_name" placeholder="New Name"><br>
+
+            <label for="update_new_password">New Password:</label><br>
+            <input type="text" id="update_new_password" name="update_new_password" placeholder="New Password"><br>
+
+            <label for="update_new_type">New Account Type:</label><br>
+            <input type="number" id="update_new_type" name="update_new_type" placeholder="Account Type"><br>
+        </form>
+        <button type="button" id = "update_user">Update User</button><br>
+
+      <h1>Delete User</h1><br>
+        <form>
+            <label for="delete_user">Username:</label><br>
+            <input type="delete_user" id="delete_user" name="delete_user" placeholder="Username"><br>
+        </form>
+        <button type="button" id = "delete_user_button">Delete User</button><br>
+
+      <h1>Update a Class</h1>
+        <form>
+            <label for="original_className">Original Class Name:</label><br>
+            <input type="text" id="original_className" name="original_class_name" placeholder="Original Class Name"><br>
+
+            <label for="new_className">New Class Name:</label><br>
+            <input type="text" id="new_className" name="new_class_name" placeholder="New Class Name"><br>
+
+            <label for="new_teacher">New Teacher:</label><br>
+            <input type="text" id="new_teacher" name="new_teacher" placeholder="New Teacher"><br>
+
+            <label for="new_time">New Time:</label><br>
+            <input type="text" id="new_time" name="new_time" placeholder="New Time"><br>
+
+            <label for="new_enrolled">New Enrolled Amount:</label><br>
+            <input type="text" id="new_enrolled" name="new_enrolled" placeholder="New Enrolled Amount"><br>
+
+            <label for="new_capacity">New Capacity:</label><br>
+            <input type="text" id="new_capacity" name="new_capacity" placeholder="New Capacity"><br>
+        </form>
+        <button type="button" id = "update_class">Update Class</button><br>
+
+      <h1>Delete Class</h1>
+        <form>
+            <label for="delete_class">Class Name:</label><br>
+            <input type="delete_class" id="delete_class" name="delete_class" placeholder="Class Name"><br>
+        </form>
+        <button type="button" id = "delete_class_button">Delete Class</button><br>
+
+      <h1>Update Grade</h1><br>
+        <form>
+            <label for="grade_name">Username:</label><br>
+            <input type="text" id="grade_name" name="update_grade_name" placeholder="Username"><br>
+
+            <label for="grade_classname">Class Name:</label><br>
+            <input type="text" id="grade_classname" name="update_grade_classname" placeholder="Class Name"><br>
+
+            <label for="updated_grade">Grade:</label><br>
+            <input type="number" id="updated_grade" name="update_grade" placeholder="Grade"><br>
+        </form>
+        <button type="button" id = "update_grade_button">Update Grade</button><br>
+
+      <h1>Unenroll User From a Course</h1>
+        <form>
+            <label for="delete_enroll_name">Username:</label><br>
+            <input type="delete_enroll_name" id="delete_enroll_name" name="delete_enroll_name" placeholder="Username"><br>
+
+            <label for="delete_enroll_class">Class Name:</label><br>
+            <input type="delete_enroll_class" id="delete_enroll_class" name="delete_enroll_class" placeholder="Class Name"><br>
+        </form>
+        <button type="button" id = "unenroll_user">Unenroll User</button><br>
+
+      <h1>
+          <button type="button" id = "logoutAdmin" class = "logout">Log Out</button>
+      </h1>
+      <script src="../static/script.js"></script>
+  </div>
 </body>
 </html>
+<style>
+    /* Style for the header */
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: white;
+  }
+  
+  /* Style for the table */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    border-color: white;
+  }
+  
+  th, td {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+    color: black;
+    background-color: white;
+    
+  }
+  
+  tr:hover {
+    background-color: rgb(28, 27, 27);
+  }
+  
+  /* Style for the form */
+  body{
+    background-color: rgb(54, 110, 194);
+  }
+
+  form {
+    margin-bottom: 1rem;
+  }
+  
+  label {
+    font-size: 1.2rem;
+    margin-right: 1rem;
+    color: white;
+  }
+  
+  input {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  button {
+    background-color: rgb(209, 174, 17);
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 1rem;
+  }
+  
+  button:hover {
+    background-color: #e4cd4e;
+  }
+  
+  /* Style for the page wrapper */
+  div {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+  
+</style>
