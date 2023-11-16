@@ -5,10 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+        .container {
+            width: 90%;
+            margin: auto;
+            overflow: hidden;
+        }
+
         table {
             border-collapse: collapse;
-            width: 50%;
+            width: 100%;
             margin-bottom: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         th, td {
@@ -20,9 +38,26 @@
         th {
             background-color: #f2f2f2;
         }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        button {
+            display: inline-block;
+            background: #0D47A1;
+            color: #fff;
+            padding: 10px 20px;
+            margin: 10px 0;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        button:hover {
+            background: #1565C0;
+        }
     </style>
 </head>
 <body>
+  <div class="container">
     <h1>Admin Dashboard</h1>
 
     <!-- User Table -->
@@ -79,7 +114,7 @@
     </table>
 
     <button onclick="populateTables()">Populate Tables</button>
-
+  </div>
     <script>
 
 
