@@ -3,6 +3,7 @@
 <head>
     <title>Teacher Page</title>
     <link rel="stylesheet" type="text/css" href="teacherstyle.css">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
     <div class="header">
@@ -50,49 +51,84 @@
         function showCourseDetails(courseId) {
             var detailsContainer = document.querySelector('.course-details');
             detailsContainer.innerHTML = '';
-    
-          
+
             var header = document.createElement('h2');
             header.textContent = `Course Details - ID: ${courseId}`;
-    
+
             var backButton = document.createElement('button');
             backButton.textContent = 'Back to Courses';
             backButton.addEventListener('click', function () {
                 showCourseList();
             });
-    
+
+
             var table = document.createElement('table');
             table.innerHTML = `
                 <tr>
                     <th>Student Name</th>
                     <th>Grades</th>
+                    <th>Action</th> <!-- Added column for edit button -->
                 </tr>
             `;
-    
-           
+
             fetch(`http://127.0.0.1:5000/class/${courseId}`, { method: 'GET' })
                 .then(response => response.json())
                 .then(data => {
                     data.students.forEach(student => {
                         var row = table.insertRow(-1);
                         row.insertCell(0).innerHTML = student.student_name;
-                        row.insertCell(1).innerHTML = student.grade;
+
+                        var gradeCell = row.insertCell(1);
+                        var gradeInput = document.createElement('input');
+                        gradeInput.type = 'text';
+                        gradeInput.value = student.grade;
+                        gradeCell.appendChild(gradeInput);
+
+    
+                        var editButtonCell = row.insertCell(2);
+                        var editButton = document.createElement('button');
+                        editButton.textContent = 'Edit';
+                        editButton.addEventListener('click', function () {
+                            var studentId = student.student_id; 
+                            editGrade(gradeInput, studentId, courseId);
+                        });
+                        editButtonCell.appendChild(editButton);
                     });
                 })
                 .catch(error => console.error('Error fetching student data:', error));
-    
-        
+
             detailsContainer.appendChild(header);
             detailsContainer.appendChild(backButton);
             detailsContainer.appendChild(table);
-    
-        
+            
+
             detailsContainer.style.display = 'block';
         }
-    
-        function showCourseList() {
-            document.querySelector('.course-details').style.display = 'none';
+
+        function editGrade(gradeInput,studentId,courseId) {
+            const csrfToken = document.querySelector('meta[name=csrf-token]').getAttribute('content');
+            var updatedGrade = gradeInput.value;
+            var postData = {
+                "student_id": studentId,
+                "grades": updatedGrade
+            };
+
+            fetch(`http://127.0.0.1:5000/class/${courseId}/update-grades`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify(postData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Grade updated successfully:', data);
+            })
+            .catch(error => console.error('Error updating grade:', error));
         }
+
+
     </script>
     
 </body>
