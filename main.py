@@ -85,9 +85,12 @@ def login():
                 login_user(person)
                 if (person.type == 'student'):
                     thePerson = Student.query.filter_by(user_id=person.id).first()
+                    return redirect(url_for('dashboard',  user_name=thePerson.name))
                 elif(person.type == 'teacher'):
                     thePerson = Teacher.query.filter_by(user_id=person.id).first()
-                return redirect(url_for('dashboard',  user_name=thePerson.name))
+                    return redirect(url_for('dashboard',  user_name=thePerson.name))
+                else:
+                    return redirect(url_for('dashboard' user_name ="admin"))
     return render_template('login.html', form=form)
 
 @app.route('/logout', methods=['GET','POST'])
