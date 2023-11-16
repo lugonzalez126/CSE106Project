@@ -237,15 +237,16 @@ def update_grades(course_id):
             if 'grades' not in data:
                 return jsonify({"message": "Grades data is required"}), 400
 
-            grades_data = data['grades']
+            grade = data['grades']
 
-            for student_id, grade in grades_data.items():
-                student = Student.query.get(student_id)
+            student_id = data['student_id']
 
-                if student and student in course.students:
-                    student.grade = grade
-                    db.session.commit()
-                else:
+            student = Student.query.filter_by(id = student_id).first()
+
+            if student and student in course.students:
+                student.grade = grade
+                db.session.commit()
+            else:
                     return jsonify({"message": f"Student with ID {student_id} not found or not enrolled in the course"}), 400
 
             return jsonify({"message": "Grades updated successfully"}), 200
