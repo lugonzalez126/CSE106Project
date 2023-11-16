@@ -134,7 +134,7 @@ def student_class():
         if teacher:
             teacher_courses = teacher.courses
             teacher_classes = [
-                {"name": teacher.name, "course_name": course.course_name, "time": course.time, "capacity": course.capacity}
+                {"name": teacher.name, "course_name": course.course_name, "time": course.time,"amount":len(course.students), "capacity": course.capacity}
                 for course in teacher_courses
             ]
             return jsonify({"classes": teacher_classes})
