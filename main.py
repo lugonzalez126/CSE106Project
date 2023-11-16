@@ -158,9 +158,10 @@ def all_classes():
          all_classes.append(class_info)
     return jsonify({"classes": all_classes})
 
-@app.route('/enroll', methods=['POST'])
+@app.route('/enroll', methods=['POST','DELETE'])
 @login_required
 def enroll_in_class():
+    print("working")
     user = current_user
     if user.type == 'student':
         data = request.get_json()
@@ -173,7 +174,7 @@ def enroll_in_class():
             return jsonify({"message": "Class not found"}), 404
         for s in students:
             if s in course.students:
-                course.students.remove(user)
+                course.students.remove(s)
                 db.session.commit()
                 return jsonify({"message": "Student removed from the class"}), 200
         if len(course.students) >= course.capacity:
