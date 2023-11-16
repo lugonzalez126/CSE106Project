@@ -253,6 +253,29 @@ def update_grades(course_id):
     else:
         return jsonify({"message": "Access forbidden"}), 403
 
+@app.route('/admin', methods=['GET'])
+def admin_dashboard():
+    all_courses = Course.query.all()
+    all_students = Student.query.all()
+    all_teachers = Teacher.query.all()
+
+    response_data = {
+        "courses": [
+            {"id": course.id, "course_name": course.course_name, "time": course.time, "capacity": course.capacity}
+            for course in all_courses
+        ],
+        "students": [
+            {"id": student.id, "name": student.name, "grade": student.grade}
+            for student in all_students
+        ],
+        "teachers": [
+            {"id": teacher.id, "name": teacher.name}
+            for teacher in all_teachers
+        ],
+    }
+
+    return jsonify(response_data)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
