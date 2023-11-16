@@ -90,7 +90,7 @@ def login():
                     thePerson = Teacher.query.filter_by(user_id=person.id).first()
                     return redirect(url_for('dashboard',  user_name=thePerson.name))
                 else:
-                    return redirect(url_for('dashboard' user_name ="admin"))
+                    return redirect(url_for('dashboard', user_name ="admin"))
     return render_template('login.html', form=form)
 
 @app.route('/logout', methods=['GET','POST'])
