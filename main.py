@@ -159,22 +159,23 @@ def all_classes():
 @login_required
 def enroll_in_class():
     user = current_user
-
     if user.type == 'student':
         data = request.get_json()
+        students = Student.query.filter_by(user_id=user.id).all()
         if 'class_id' not in data:
             return jsonify({"message": "Class ID is required"}), 400
         class_id = data['class_id']
         course = Course.query.get(class_id)
         if not course:
             return jsonify({"message": "Class not found"}), 404
-        if user in course.students:
-            course.students.remove(user)
-            db.session.commit()
-            return jsonify({"message": "Student removed from the class"}), 200
+        for s in students:
+            if s in course.students:
+                course.students.remove(user)
+                db.session.commit()
+                return jsonify({"message": "Student removed from the class"}), 200
         if len(course.students) >= course.capacity:
             return jsonify({"message": "Class is full"}), 400
-        course.students.append(user)
+        course.students.append(students[0])
         db.session.commit()
         return jsonify({"message": "Enrollment successful"}), 200
 
