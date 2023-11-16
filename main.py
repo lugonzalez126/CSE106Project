@@ -257,11 +257,16 @@ def update_grades(course_id):
 
 @app.route('/admin', methods=['GET'])
 def admin_dashboard():
+    all_users = User.query.all()
     all_courses = Course.query.all()
     all_students = Student.query.all()
     all_teachers = Teacher.query.all()
 
     response_data = {
+        "users": [
+            {"id":user.id, "username": user.username, "type": user.type, "password": user.password}
+            for user in all_users
+        ],
         "courses": [
             {"id": course.id, "course_name": course.course_name, "time": course.time, "capacity": course.capacity}
             for course in all_courses
