@@ -50,20 +50,44 @@ class Course(db.Model):
     course_name = db.Column(db.String(80))
     capacity = db.Column(db.Integer)
 
-admin.add_view(ModelView(Course, db.session))
+
 class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
     courses = db.relationship('Course', secondary=courses_students,back_populates='students')
     grade = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-admin.add_view(ModelView(Student, db.session))
+
+
 class Teacher(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
     courses = db.relationship('Course', secondary=courses_teachers,back_populates='teachers')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
+class CourseView(ModelView):
+    column_display_pk = True
+    column_labels = {'id': 'Course ID', 'time': 'Time', 'course_name': 'Course Name', 'capacity': 'Capacity'}
+
+    form_columns = ['time', 'course_name', 'capacity', 'students', 'teachers']
+
+
+class StudentView(ModelView):
+    column_display_pk = True
+    column_labels = {'id': 'Student ID', 'name': 'Student Name', 'grade': 'Grade'}
+
+    form_columns = ['name', 'grade', 'courses']
+
+
+class TeacherView(ModelView):
+    column_display_pk = True
+    column_labels = {'id': 'Teacher ID', 'name': 'Teacher Name'}
+
+    form_columns = ['name', 'courses']
+
+admin.add_view(CourseView(Course, db.session))
+admin.add_view(StudentView(Student, db.session))
+admin.add_view(TeacherView(Teacher, db.session))
 
 class Login_Form(FlaskForm):
     username = StringField(validators=[InputRequired(), Length(
