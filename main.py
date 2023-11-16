@@ -6,6 +6,8 @@ from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
+from flask_admin import Admin 
+from flask_admin.contrib.sqla import ModelView
 
 
 
@@ -14,6 +16,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project_data'
 app.config['SECRET_KEY'] ='test'
 csrf = CSRFProtect(app)
 db = SQLAlchemy(app)
+admin = Admin()
+admin.init_app(app)
 
 Login_manager = LoginManager()
 Login_manager.init_app(app)
@@ -35,6 +39,8 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(80), nullable=False, unique=True)
     type = db.Column(db.String(7))
     password = db.Column(db.String(80), nullable=False)
+
+admin.add_view(ModelView(User, db.session))
     
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -44,19 +50,20 @@ class Course(db.Model):
     course_name = db.Column(db.String(80))
     capacity = db.Column(db.Integer)
 
-
+admin.add_view(ModelView(Course, db.session))
 class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
     courses = db.relationship('Course', secondary=courses_students,back_populates='students')
     grade = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
+admin.add_view(ModelView(Student, db.session))
 class Teacher(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
     courses = db.relationship('Course', secondary=courses_teachers,back_populates='teachers')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
 
 class Login_Form(FlaskForm):
     username = StringField(validators=[InputRequired(), Length(
@@ -65,6 +72,7 @@ class Login_Form(FlaskForm):
         min=2, max=20)], render_kw={"placeholder": "Password"})
     
     submit = SubmitField("login")
+
 
 @Login_manager.user_loader
 def load_user(user_id):
@@ -90,7 +98,7 @@ def login():
                     thePerson = Teacher.query.filter_by(user_id=person.id).first()
                     return redirect(url_for('dashboard',  user_name=thePerson.name))
                 else:
-                    return redirect(url_for('dashboard', user_name ="admin"))
+                    return redirect(url_for('admin.index'))
     return render_template('login.html', form=form)
 
 @app.route('/logout', methods=['GET','POST'])
@@ -109,7 +117,7 @@ def dashboard():
     elif user.type == 'teacher':
         return render_template('teacher.html', user=current_user,  user_name = user_name)
     elif user.type == 'admin':
-        return render_template('admin.html', user=current_user,  user_name = user_name)
+        return render_template('admin2.html', user=current_user,  user_name = user_name)
     else:
         return "Unknown type"
 @app.route('/classes', methods = ['GET'])
@@ -255,7 +263,7 @@ def update_grades(course_id):
     else:
         return jsonify({"message": "Access forbidden"}), 403
 
-@app.route('/admin', methods=['GET'])
+@app.route('/admin2', methods=['GET'])
 def admin_dashboard():
     all_users = User.query.all()
     all_courses = Course.query.all()
