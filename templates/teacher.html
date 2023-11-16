@@ -1,14 +1,175 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Teacher Page</title>
+    <link rel="stylesheet" type="text/css" href="teacherstyle.css">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
-    <h1>Logged in</h1>
-    <h2>Hi {{ user.name }}</h2>
-    <h1>Hello you are an teacher</h1>
-    <a href="{{url_for('logout')}}">Logout</a>
+    <div class="header">
+        <h1>UC Merced</h1>
+        <h2>Welcome, {{ user_name }}</h2>
+        <a href="{{url_for('logout')}}">Logout</a>
+    </div>
+
+    <h2>Your Courses</h2>
+
+    <table id="courses-table">
+        <tr>
+            <th>Course Name</th>
+            <th>Teacher</th>
+            <th>Time</th>
+            <th>Students Enrolled / Max Capacity</th>
+        </tr>
+    </table>
+
+
+    <div class="course-details" style="display: none;"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+         
+            fetch('http://127.0.0.1:5000/classes')
+                .then(response => response.json())
+                .then(data => displayCourses(data))
+                .catch(error => console.error('Error:', error));
+        });
+    
+        function displayCourses(data) {
+            var table = document.getElementById('courses-table');
+    
+           
+            data.classes.forEach(course => {
+                var row = table.insertRow(-1);
+                row.insertCell(0).innerHTML = `<a href="#" onclick="showCourseDetails(${course.id})">${course.course_name}</a>`;
+                row.insertCell(1).innerHTML = course.name;
+                row.insertCell(2).innerHTML = course.time;
+                row.insertCell(3).innerHTML = course.amount + ' / ' + course.capacity;
+            });
+        }
+    
+        function showCourseDetails(courseId) {
+            var detailsContainer = document.querySelector('.course-details');
+            detailsContainer.innerHTML = '';
+
+            var header = document.createElement('h2');
+            header.textContent = `Course Details - ID: ${courseId}`;
+
+            var backButton = document.createElement('button');
+            backButton.textContent = 'Back to Courses';
+            backButton.addEventListener('click', function () {
+                showCourseList();
+            });
+
+
+            var table = document.createElement('table');
+            table.innerHTML = `
+                <tr>
+                    <th>Student Name</th>
+                    <th>Grades</th>
+                    <th>Action</th> <!-- Added column for edit button -->
+                </tr>
+            `;
+
+            fetch(`http://127.0.0.1:5000/class/${courseId}`, { method: 'GET' })
+                .then(response => response.json())
+                .then(data => {
+                    data.students.forEach(student => {
+                        var row = table.insertRow(-1);
+                        row.insertCell(0).innerHTML = student.student_name;
+
+                        var gradeCell = row.insertCell(1);
+                        var gradeInput = document.createElement('input');
+                        gradeInput.type = 'text';
+                        gradeInput.value = student.grade;
+                        gradeCell.appendChild(gradeInput);
+
+    
+                        var editButtonCell = row.insertCell(2);
+                        var editButton = document.createElement('button');
+                        editButton.textContent = 'Edit';
+                        editButton.addEventListener('click', function () {
+                            var studentId = student.student_id; 
+                            editGrade(gradeInput, studentId, courseId);
+                        });
+                        editButtonCell.appendChild(editButton);
+                    });
+                })
+                .catch(error => console.error('Error fetching student data:', error));
+
+            detailsContainer.appendChild(header);
+            detailsContainer.appendChild(backButton);
+            detailsContainer.appendChild(table);
+            
+
+            detailsContainer.style.display = 'block';
+        }
+
+        function editGrade(gradeInput,studentId,courseId) {
+            const csrfToken = document.querySelector('meta[name=csrf-token]').getAttribute('content');
+            var updatedGrade = gradeInput.value;
+            var postData = {
+                "student_id": studentId,
+                "grades": updatedGrade
+            };
+
+            fetch(`http://127.0.0.1:5000/class/${courseId}/update-grades`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify(postData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Grade updated successfully:', data);
+            })
+            .catch(error => console.error('Error updating grade:', error));
+        }
+
+
+    </script>
+    
 </body>
 </html>
+
+<style>
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+.header {
+    background-color: #007BFF;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+}
+
+.header h1 {
+    font-size: 24px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+.course-details {
+    display: none;
+}
+</style>

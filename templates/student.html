@@ -1,14 +1,213 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Student Page</title>
+    <link rel="stylesheet" type="text/css" href="studentstyle.css">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
-    <h1>Logged in</h1>
-    <h2>Hi {{ user.name }}</h2>
-    <h1>Hello you are an student</h1>
-    <a href="{{url_for('logout')}}">Logout</a>
+    <div class="header">
+        <h1>UC Merced</h1>
+        <h2>Welcome, {{ user_name }}</h2>
+        <a href="{{url_for('logout')}}">Logout</a>
+    </div>
+
+    <div class="tab-container">
+        <button class="tablinks" onclick="openTab(event, 'your-courses')">Your Courses</button>
+        <button class="tablinks" onclick="openTab(event, 'add-courses')">Add Courses</button>
+    </div>
+
+    <div id="your-courses" class="tabcontent">
+        <h2>Your Courses</h2>
+        <table id="your-courses-table">
+            <tr>
+                <th>Course Name</th>
+                <th>Teacher</th>
+                <th>Time</th>
+                <th>Students Enrolled / Max Capacity</th>
+            </tr>
+        </table>
+    </div>
+
+    <div id="add-courses" class="tabcontent">
+        <h2>Add Courses</h2>
+        <table id="add-courses-table">
+            <tr>
+                <th>Course Name</th>
+                <th>Teacher</th>
+                <th>Time</th>
+                <th>Students Enrolled</th>
+                <th>Add Class</th>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('http://127.0.0.1:5000/classes')
+                .then(response => response.json())
+                .then(data => {
+                    displayCourses(data, 'your-courses-table');
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('http://127.0.0.1:5000/allclasses')
+                .then(response => response.json())
+                .then(data => {
+                    displayCourses(data, 'add-courses-table', true);
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    
+        function displayCourses(data, tableId, addButton = false) {
+            const csrfToken = document.querySelector('meta[name=csrf-token]').getAttribute('content');
+            var table = document.getElementById(tableId);
+    
+            data.classes.forEach(course => {
+                var row = table.insertRow(-1);
+                row.insertCell(0).innerHTML = course.course_name;
+                row.insertCell(1).innerHTML = course.teacher_name;
+                row.insertCell(2).innerHTML = course.time;
+                row.insertCell(3).innerHTML = course.amount + ' / ' + course.capacity;
+    
+                if (addButton) {
+                    var addButtonCell = row.insertCell(4);
+    
+                    var addBtn = document.createElement('button');
+                    addBtn.textContent = 'Add Class';
+                    addBtn.addEventListener('click', function () {
+                        enrollClass(course.id, 'add',csrfToken);
+                    });
+                    addButtonCell.appendChild(addBtn);
+    
+                    var subtractBtn = document.createElement('button');
+                    subtractBtn.textContent = 'Drop Class';
+                    subtractBtn.addEventListener('click', function () {
+                        enrollClass(course.id, 'drop',csrfToken);
+                    });
+                    addButtonCell.appendChild(subtractBtn);
+                }
+            });
+        }
+    
+    function enrollClass(classId, action,csrfToken) {
+        const classnum = {
+            "class_id" : classId
+        };
+        type = "POST"
+        if (action == "drop"){
+            type = "DELETE"
+        }
+        const requestOptions = {
+            method: type,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken, // Include the CSRF token in the headers
+            },
+            body: JSON.stringify(classnum)
+        };
+        fetch('http://127.0.0.1:5000/enroll', requestOptions)
+            .then(response => {
+                if (!response.ok) {
+                    alert("Failed to create a new student record.");
+                    throw new Error('Network failed');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert("Class enrolled/dropped successfully.");
+            })
+            .catch(error => {
+                console.error('Problem with the fetch operation:', error);
+            });
+}
+      
+    </script>
 </body>
 </html>
+
+<style>
+/* Add your CSS styles here */
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+.header {
+    background-color: #007BFF;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+}
+
+.header h1 {
+    font-size: 24px;
+}
+
+.tab-container {
+    background-color: #333;
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.tablinks {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 0 10px;
+}
+
+.tablinks:hover {
+    background-color: #444;
+}
+
+.tabcontent {
+    display: none;
+    padding: 20px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+</style>
+   
+

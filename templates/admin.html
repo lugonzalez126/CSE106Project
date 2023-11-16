@@ -3,12 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Admin Dashboard</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 50%;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
 <body>
-    <h1>Logged in</h1>
-    <h2>Hi {{ user.name }}</h2>
-    <h1>Hello you are an admin</h1>
-    <a href="{{url_for('logout')}}">Logout</a>
+    <h1>Admin Dashboard</h1>
+
+    <!-- User Table -->
+    <h2>User Table</h2>
+    <table id="userTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Type</th>
+                <th>Password</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <!-- Course Table -->
+    <h2>Course Table</h2>
+    <table id="courseTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Course Name</th>
+                <th>Time</th>
+                <th>Capacity</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <!-- Student Table -->
+    <h2>Student Table</h2>
+    <table id="studentTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Grade</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <!-- Teacher Table -->
+    <h2>Teacher Table</h2>
+    <table id="teacherTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <button onclick="populateTables()">Populate Tables</button>
+
+    <script>
+
+
+function populateTables() {
+    fetch('http://127.0.0.1:5000/admin', { method: 'GET' })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Data received from server:', data);
+
+        // Check if the expected properties exist in the data
+        if (data.users && data.courses && data.students && data.teachers) {
+            populateTable('userTable', data.users)
+            populateTable('courseTable', data.courses);
+            populateTable('studentTable', data.students);
+            populateTable('teacherTable', data.teachers);
+        } else {
+            console.error('Unexpected data structure:', data);
+        }
+    })
+    .catch(error => console.error('Error fetching data:', error));
+}
+function populateTable(tableId, data) {
+    // Get the table element by its ID
+    var table = document.getElementById(tableId);
+
+    // Clear existing table data
+    table.getElementsByTagName('tbody')[0].innerHTML = '';
+
+    // Loop through the data and add rows to the table
+    for (var i = 0; i < data.length; i++) {
+        var row = table.insertRow(i + 1); // Start from 1 to skip header row
+
+        // Loop through each property in the data and add cells to the row
+        for (var key in data[i]) {
+            if (data[i].hasOwnProperty(key)) {
+                var cell = row.insertCell();
+                cell.innerHTML = data[i][key];
+            }
+        }
+    }
+}
+    </script>
 </body>
 </html>
