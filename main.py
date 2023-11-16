@@ -142,6 +142,18 @@ def student_class():
             return jsonify({"message": "Teacher not found"}), 404
     else:
         return jsonify({"message": "Access forbidden"}), 403
+    
+@app.route('/allclasses', methods = ['GET'])
+@login_required
+def all_classes():
+    class_list = Course.query.all()
+    all_classes = []
+    for c in class_list:
+         course_count = len(c.students)
+         teacher = c.teachers[0]
+         class_info = {"id": c.id, "course_name": c.course_name, "time": c.time, "capacity": c.capacity, "amount":course_count, "teacher_name": teacher.name}
+         all_classes.append(class_info)
+    return jsonify({"classes": all_classes})
 
 @app.route('/enroll', methods=['POST'])
 @login_required
